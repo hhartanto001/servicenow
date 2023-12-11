@@ -1,0 +1,2 @@
+# This code is used in a scheduled job to automatically refresh CAB meetings.
+# This will generate records under the cab_meeting table, depending on the cab_definition record it is attached to.
