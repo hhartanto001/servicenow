@@ -1,0 +1,6 @@
+var cabDefinitionGR = new GlideRecord('cab_definition');
+cabDefinitionGR.query();
+
+while(cabDefinitionGR.next()){
+new sn_change_cab.CABDefinition(cabDefinitionGR).refreshMeetings();
+}
