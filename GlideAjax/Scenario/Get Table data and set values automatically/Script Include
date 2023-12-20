@@ -1,0 +1,133 @@
+var OnboardingProfileUtils = Class.create();
+OnboardingProfileUtils.prototype = Object.extendsObject(AbstractAjaxProcessor, {
+    type: 'OnboardingProfileUtils',
+
+    //Define functions
+
+    getProfiles: function() {
+        //Define the parameters from client script
+        var department = this.getParameter("sysparm_department");
+        var jobProfile = this.getParameter("sysparm_jobProfile");
+        var jobProfileClass = this.getParameter("sysparm_jobProfileClass");
+        var BusinessUnit = this.getParameter("sysparm_UWBusinessUnit");
+        var UWType = this.getParameter("sysparm_UWType");
+
+        //Set field values in multiple lists
+        var cat_item = [];
+        var cat_item_sysid = [];
+        var visible = [];
+        var readOnly = [];
+        var checked = [];
+        var special_instructions = [];
+
+        //GlideRecord the table with the queries as parameters
+        var underWritingGR = new GlideRecord('u_onboarding_saf_items');
+        underWritingGR.addQuery('u_department', department.slice(0, 5));
+        underWritingGR.addQuery('u_job_profile', jobProfile);
+        underWritingGR.addQuery('u_job_profile_subclass', jobProfileClass);
+        underWritingGR.addQuery('u_business_unit', BusinessUnit);
+        underWritingGR.query();
+
+
+        //Initialize the returnable JSON variable
+        var payload = {};
+
+        //Populate lists
+        while (underWritingGR.next()) {
+            var variableGR = new GlideRecord('item_option_new');
+            variableGR.get(underWritingGR.u_catalog_item);
+
+            var ruleBaseGR = new GlideRecord('sc_cat_item_guide_items');
+            ruleBaseGR.addEncodedQuery('guide=ec440049476931d02394c133846d43e2^item.name=' + underWritingGR.u_catalog_item.getDisplayValue()); //System Access Form - Onboarding
+            ruleBaseGR.query();
+
+            if (ruleBaseGR.next()) {
+                var catItemGR = new GlideRecord('sc_cat_item');
+                catItemGR.get(ruleBaseGR.item);
+            }
+
+            cat_item.push(variableGR.name.toString());
+            cat_item_sysid.push(catItemGR.sys_id.toString());
+            visible.push(underWritingGR.u_visible.toString());
+            readOnly.push(underWritingGR.u_read_only.toString());
+            checked.push(underWritingGR.u_checked.toString());
+            special_instructions.push(underWritingGR.u_special_instructions.toString());
+        }
+
+
+        //Set payload values
+        for (var i = 0; i < checked.length; i++) {
+
+            payload[cat_item[i]] = {};
+            payload[cat_item[i]].visible = visible[i];
+            payload[cat_item[i]].readOnly = readOnly[i];
+            payload[cat_item[i]].checked = checked[i];
+            payload[cat_item[i]].special_instructions = special_instructions[i];
+            payload[cat_item[i]].sys_id = cat_item_sysid[i];
+        }
+        gs.log(JSON.stringify(payload), 'HH');
+        return JSON.stringify(payload);
+    },
+
+    getInstructions: function() {
+        var department = this.getParameter("sysparm_department");
+        var jobProfile = this.getParameter("sysparm_jobProfile");
+        var jobProfileClass = this.getParameter("sysparm_jobProfileClass");
+        var BusinessUnit = this.getParameter("sysparm_UWBusinessUnit");
+		
+		gs.log(department + jobProfile + jobProfileClass + BusinessUnit);
+
+        var cat_item = [];
+        var cat_item_sysid = [];
+        var special_instructions = [];
+		var field_name = [];
+
+        //GlideRecord the table with the queries as parameters
+        var instructionsGR = new GlideRecord('u_onboarding_saf_special_instructions');
+        instructionsGR.addQuery('u_department', department.slice(0, 5));
+        instructionsGR.addQuery('u_job_profile', jobProfile);
+        instructionsGR.addQuery('u_job_profile_subclass', jobProfileClass);
+        instructionsGR.addQuery('u_business_unit', BusinessUnit);
+        instructionsGR.query();
+
+        //Initialize the returnable JSON variable
+        var payload = {};
+
+        //Populate lists
+        while (instructionsGR.next()) {
+            var variableGR = new GlideRecord('item_option_new');
+            variableGR.get(instructionsGR.u_catalog_item);
+			
+			var fieldGR = new GlideRecord('item_option_new');
+			fieldGR.get(instructionsGR.u_variable);
+
+            var ruleBaseGR = new GlideRecord('sc_cat_item_guide_items');
+            ruleBaseGR.addEncodedQuery('guide=ec440049476931d02394c133846d43e2^item.name=' + instructionsGR.u_catalog_item.getDisplayValue()); //System Access Form - Onboarding
+            ruleBaseGR.query();
+
+            if (ruleBaseGR.next()) {
+                var catItemGR = new GlideRecord('sc_cat_item');
+                catItemGR.get(ruleBaseGR.item);
+            }
+
+            cat_item.push(variableGR.name.toString());
+            cat_item_sysid.push(catItemGR.sys_id.toString());
+			field_name.push(fieldGR.name.toString());
+            special_instructions.push(instructionsGR.u_special_instructions.toString());
+        }
+
+
+        //Set payload values
+        for (var i = 0; i < cat_item_sysid.length; i++) {
+
+            payload[i] = {};
+			payload[i].sys_id = cat_item_sysid[i];
+			payload[i].field_name = field_name[i];
+            payload[i].special_instructions = special_instructions[i];
+
+        }
+        gs.log(JSON.stringify(payload), 'HH1');
+        return JSON.stringify(payload);
+
+
+    }
