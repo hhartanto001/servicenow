@@ -1,0 +1,41 @@
+function onLoad() {
+
+    //Retrieve form values
+    if (g_form.getValue('form_action') == 'onboard' && g_form.getValue('profile_class') == 'a9f37822dbceaf00118f71fa8c9619d5') {
+        var department = g_form.getValue('department');
+        var profile_class = g_form.getValue('profile_class');
+        var profile_subclass = g_form.getValue('profile_subclass');
+        var uw = g_form.getDisplayValue('uw_business_unit');
+        var catalog_item_id = g_form.getUniqueValue();
+	
+
+
+        var ga = new GlideAjax('OnboardingProfileUtils'); // Use the Script Include name
+        ga.addParam('sysparm_name', 'getInstructions'); // The function to call in the Script Include
+        ga.addParam('sysparm_department', department); // Pass any parameters needed by the function
+        ga.addParam('sysparm_jobProfile', profile_class);
+        ga.addParam('sysparm_jobProfileClass', profile_subclass);
+        ga.addParam('sysparm_UWBusinessUnit', uw);
+
+        ga.getXMLAnswer(function(answer) {
+
+            var response = JSON.parse(answer);
+
+            if (response != null) {
+                for (var i = 0; i < Object.keys(response).length; i++) {
+                    var name = Object.keys(response)[i];
+					
+                    var element = response[Object.keys(response)[i]];
+					
+					
+                    if (element.sys_id == catalog_item_id) {
+						
+                        g_form.setValue(element.field_name, element.special_instructions);
+                    }
+
+                }
+                //Do stuff here
+            }
+        });
+    }
+}
