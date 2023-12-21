@@ -1,0 +1,30 @@
+filterJobProfileSubClass: function(profile_class, department) {
+
+        //return everything if the profile_class value is not Claims and Underwriting
+        if (profile_class != 'cd97b38bdb1d6784e93c92b6db961925' && profile_class != 'a9f37822dbceaf00118f71fa8c9619d5') {
+
+            return "active=true^profile_class=" + profile_class;
+
+        }
+
+
+        //Get Proper Query if Claims
+        if (profile_class == 'cd97b38bdb1d6784e93c92b6db961925') {
+            var gr = new GlideRecord('u_manage_onboarding_catalog_items');
+            gr.addQuery('u_department', department.slice(0, 5));
+            gr.query();
+            var list = '';
+
+            if (gr.getRowCount() == '1') {
+                if (gr.next()) {
+                    return 'profile_class=cd97b38bdb1d6784e93c92b6db961925^active=true^sys_id=' + gr.u_job_profile_subclass;
+                }
+            } else {
+                while (gr.next()) {
+                    list += 'sys_id=' + gr.u_job_profile_subclass + '^OR';
+                }
+            }
+
+            var test = list.slice(0, -3);
+            return 'profile_class=cd97b38bdb1d6784e93c92b6db961925^active=true^' + test;
+        }
