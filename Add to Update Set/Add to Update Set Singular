@@ -1,0 +1,10 @@
+// Reference Link below:
+// https://servicenowguru.com/system-definition_manual-update-set-inclusion/
+
+//Query for the record
+var rec = new GlideRecord('table_name');
+rec.get('record_sysid');
+
+//Push the record into the current update set   
+var um = new GlideUpdateManager2();
+um.saveRecord(rec);
