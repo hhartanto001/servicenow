@@ -1,0 +1,26 @@
+#Onclick function
+function confirmCAB(){
+	#Creates a confirmation box that looks similar to the alert() function
+	var answer = confirm('Moving forward will assign this Business Change Request to the CAB assignment group. Please confirm that all additional CAB members have been added before clicking "OK".');
+
+	if(answer){
+	#If user clicks 'OK', run the UI action again, but this time, skip the Onclick function
+		gsftSubmit(null, g_form.getFormElement(), 'assign_cab');
+	}
+	else{
+		#Do nothing
+	}
+}
+
+#Run server-side code
+if (typeof window == 'undefined') {
+    confirmDecision();
+}
+
+#Sets assignment group, saves the form, and finally refreshes form
+function confirmDecision(){
+current.assignment_group.setDisplayValue('CAB');
+current.update();
+action.setRedirectURL(current);
+}
+
