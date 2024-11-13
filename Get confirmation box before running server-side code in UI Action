@@ -1,3 +1,6 @@
+#Action name: assign_cab 
+#Onclick: confirmCAB() 
+
 #Onclick function
 function confirmCAB(){
 	#Creates a confirmation box that looks similar to the alert() function
